@@ -6,34 +6,65 @@
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
   <script src="https://unpkg.com/aframe-event-set-component"></script>
   <style>
-    body { margin: 0; font-family: sans-serif; }
-    #title {
-      position: absolute;
-      top: 10px;
-      width: 100%;
-      text-align: center;
-      font-size: 28px;
-      font-weight: bold;
-      color: #fff;
-      text-shadow: 2px 2px 4px #000;
-      z-index: 999;
-    }
-    #quizModal {
-      display: none;
-      position: absolute;
-      top: 20%;
-      left: 25%;
-      width: 50%;
-      background: white;
-      padding: 20px;
-      box-shadow: 0 0 10px black;
-      z-index: 1000;
-      border-radius: 10px;
-    }
-  </style>
+  body { margin: 0; font-family: sans-serif; }
+  #title {
+    position: absolute;
+    top: 10px;
+    width: 100%;
+    text-align: center;
+    font-size: 28px;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 2px 2px 4px #000;
+    z-index: 999;
+  }
+  #quizModal {
+    display: none;
+    position: absolute;
+    top: 20%;
+    left: 25%;
+    width: 50%;
+    background: white;
+    padding: 20px;
+    box-shadow: 0 0 10px black;
+    z-index: 1000;
+    border-radius: 10px;
+  }
+
+  #startBtn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 18px 36px;
+    font-size: 20px;
+    font-weight: bold;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    z-index: 1001;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+  }
+
+  #startBtn:hover {
+    background-color: #218838;
+    transform: translate(-50%, -50%) scale(1.05);
+  }
+</style>
+
 </head>
 <body>
+
+  <!-- Judul -->
   <div id="title">🌍 Virtual Zoo World Tour</div>
+
+  <!-- Tombol Mulai (agar audio nature bisa diputar) -->
+  <button id="startBtn">Mulai Tur</button>
+
+  <!-- Kuis -->
   <div id="quizModal">
     <h3>Kuis Interaktif</h3>
     <p>Hewan apa yang berasal dari benua Afrika?</p>
@@ -41,6 +72,7 @@
     <button onclick="alert('Coba lagi')">Penguin</button>
   </div>
 
+  <!-- Scene A-Frame -->
   <a-scene background="color: #87CEEB">
     <a-assets>
       <!-- Models -->
@@ -64,29 +96,29 @@
       <audio id="kangarooNarration" src="assets/narration/kangaroo.mp3"></audio>
       <audio id="penguinNarration" src="assets/narration/penguin.mp3"></audio>
 
-      <!-- Suara lingkungan -->
-      <audio id="envSound" src="assets/sounds/nature.mp3" autoplay loop></audio>
+      <!-- Suara Lingkungan -->
+      <audio id="envSound" src="assets/sounds/nature.mp3"></audio>
     </a-assets>
 
-    <!-- Camera -->
+    <!-- Kamera & Cursor -->
     <a-entity id="camera" camera wasd-controls look-controls position="0 1.6 5">
       <a-cursor raycaster="objects: .clickable"></a-cursor>
     </a-entity>
 
-    <!-- Lighting -->
+    <!-- Pencahayaan -->
     <a-light type="ambient" color="#fff"></a-light>
     <a-light type="directional" position="1 4 -3" intensity="1.2"></a-light>
 
-    <!-- Ground -->
+    <!-- Lantai -->
     <a-plane color="#228B22" rotation="-90 0 0" height="100" width="100"></a-plane>
 
-    <!-- Environment sound -->
-    <a-entity sound="src: #envSound; autoplay: true; loop: true; volume: 1.5"></a-entity>
+    <!-- Suara lingkungan (dimainkan lewat JS) -->
+    <a-entity id="natureAudio" sound="src: #envSound; loop: true; volume: 1.5"></a-entity>
 
     <!-- Minimap -->
     <a-image src="assets/images/worldmap.jpg" position="0 3 -4" width="3" height="1.5" opacity="0.7"></a-image>
 
-    <!-- Animals -->
+    <!-- Hewan -->
     <a-entity class="clickable" gltf-model="#lionModel" position="-4 0.2 -3" scale="1 1 1"
       sound="src: #lionSound; on: click"
       event-set__enter="_event: mouseenter; scale: 1.1 1.1 1.1"
@@ -120,8 +152,10 @@
     </a-entity>
   </a-scene>
 
+  <!-- Script untuk narasi & tombol mulai -->
   <script>
     let animalsSeen = new Set();
+
     function playNarration(id) {
       document.querySelectorAll('audio').forEach(a => a.pause());
       const audio = document.getElementById(id);
@@ -134,6 +168,14 @@
         }
       }
     }
+
+    document.getElementById('startBtn').addEventListener('click', function () {
+      // Putar suara nature lewat A-Frame <a-sound>
+      document.querySelector('#natureAudio').components.sound.playSound();
+
+      // Sembunyikan tombol
+      this.style.display = 'none';
+    });
   </script>
 </body>
 </html>
