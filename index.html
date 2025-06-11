@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Virtual Zoo World Tour</title>
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+  <script src="https://unpkg.com/aframe-event-set-component"></script>
+  <style>
+    body { margin: 0; font-family: sans-serif; }
+    #title {
+      position: absolute;
+      top: 10px;
+      width: 100%;
+      text-align: center;
+      font-size: 28px;
+      font-weight: bold;
+      color: #fff;
+      text-shadow: 2px 2px 4px #000;
+      z-index: 999;
+    }
+    #quizModal {
+      display: none;
+      position: absolute;
+      top: 20%;
+      left: 25%;
+      width: 50%;
+      background: white;
+      padding: 20px;
+      box-shadow: 0 0 10px black;
+      z-index: 1000;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div id="title">🌍 Virtual Zoo World Tour</div>
+  <div id="quizModal">
+    <h3>Kuis Interaktif</h3>
+    <p>Hewan apa yang berasal dari benua Afrika?</p>
+    <button onclick="alert('Benar!')">Singa</button>
+    <button onclick="alert('Coba lagi')">Penguin</button>
+  </div>
+
+  <a-scene background="color: #87CEEB">
+    <a-assets>
+      <!-- Models -->
+      <a-asset-item id="lionModel" src="assets/models/lion.glb"></a-asset-item>
+      <a-asset-item id="elephantModel" src="assets/models/elephant.glb"></a-asset-item>
+      <a-asset-item id="tigerModel" src="assets/models/tiger.glb"></a-asset-item>
+      <a-asset-item id="kangarooModel" src="assets/models/kangaroo.glb"></a-asset-item>
+      <a-asset-item id="penguinModel" src="assets/models/penguin.glb"></a-asset-item>
+
+      <!-- Suara Hewan -->
+      <audio id="lionSound" src="assets/sounds/lion.mp3"></audio>
+      <audio id="elephantSound" src="assets/sounds/elephant.mp3"></audio>
+      <audio id="tigerSound" src="assets/sounds/tiger.mp3"></audio>
+      <audio id="kangarooSound" src="assets/sounds/kangaroo.mp3"></audio>
+      <audio id="penguinSound" src="assets/sounds/penguin.mp3"></audio>
+
+      <!-- Narasi -->
+      <audio id="lionNarration" src="assets/narration/lion.mp3"></audio>
+      <audio id="elephantNarration" src="assets/narration/elephant.mp3"></audio>
+      <audio id="tigerNarration" src="assets/narration/tiger.mp3"></audio>
+      <audio id="kangarooNarration" src="assets/narration/kangaroo.mp3"></audio>
+      <audio id="penguinNarration" src="assets/narration/penguin.mp3"></audio>
+
+      <!-- Suara lingkungan -->
+      <audio id="envSound" src="assets/sounds/nature.mp3" autoplay loop></audio>
+    </a-assets>
+
+    <!-- Camera -->
+    <a-entity id="camera" camera wasd-controls look-controls position="0 1.6 5">
+      <a-cursor raycaster="objects: .clickable"></a-cursor>
+    </a-entity>
+
+    <!-- Lighting -->
+    <a-light type="ambient" color="#fff"></a-light>
+    <a-light type="directional" position="1 4 -3" intensity="1.2"></a-light>
+
+    <!-- Ground -->
+    <a-plane color="#228B22" rotation="-90 0 0" height="100" width="100"></a-plane>
+
+    <!-- Environment sound -->
+    <a-entity sound="src: #envSound; autoplay: true; loop: true; volume: 1.5"></a-entity>
+
+    <!-- Minimap -->
+    <a-image src="assets/images/worldmap.jpg" position="0 3 -4" width="3" height="1.5" opacity="0.7"></a-image>
+
+    <!-- Animals -->
+    <a-entity class="clickable" gltf-model="#lionModel" position="-4 0.2 -3" scale="1 1 1"
+      sound="src: #lionSound; on: click"
+      event-set__enter="_event: mouseenter; scale: 1.1 1.1 1.1"
+      event-set__leave="_event: mouseleave; scale: 1 1 1"
+      onclick="playNarration('lionNarration')">
+      <a-text value="Singa (Afrika)" position="0 2 0" align="center" color="#222"></a-text>
+    </a-entity>
+
+    <a-entity class="clickable" gltf-model="#elephantModel" position="-1 0.2 -3" scale="1 1 1"
+      sound="src: #elephantSound; on: click"
+      onclick="playNarration('elephantNarration')">
+      <a-text value="Gajah (Afrika)" position="0 2 0" align="center" color="#222"></a-text>
+    </a-entity>
+
+    <a-entity class="clickable" gltf-model="#tigerModel" position="2 0.2 -3" scale="0.9 0.9 0.9"
+      sound="src: #tigerSound; on: click"
+      onclick="playNarration('tigerNarration')">
+      <a-text value="Harimau (Asia)" position="0 2 0" align="center" color="#222"></a-text>
+    </a-entity>
+
+    <a-entity class="clickable" gltf-model="#kangarooModel" position="4 0.2 -3" scale="0.9 0.9 0.9"
+      sound="src: #kangarooSound; on: click"
+      onclick="playNarration('kangarooNarration')">
+      <a-text value="Kanguru (Australia)" position="0 2 0" align="center" color="#222"></a-text>
+    </a-entity>
+
+    <a-entity class="clickable" gltf-model="#penguinModel" position="6 0.2 -3" scale="0.9 0.9 0.9"
+      sound="src: #penguinSound; on: click"
+      onclick="playNarration('penguinNarration')">
+      <a-text value="Penguin (Kutub)" position="0 2 0" align="center" color="#222"></a-text>
+    </a-entity>
+  </a-scene>
+
+  <script>
+    let animalsSeen = new Set();
+    function playNarration(id) {
+      document.querySelectorAll('audio').forEach(a => a.pause());
+      const audio = document.getElementById(id);
+      if (audio) {
+        audio.currentTime = 0;
+        audio.play();
+        animalsSeen.add(id);
+        if (animalsSeen.size >= 5) {
+          document.getElementById("quizModal").style.display = "block";
+        }
+      }
+    }
+  </script>
+</body>
+</html>
