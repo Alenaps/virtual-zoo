@@ -6,65 +6,58 @@
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
   <script src="https://unpkg.com/aframe-event-set-component"></script>
   <style>
-  body { margin: 0; font-family: sans-serif; }
-  #title {
-    position: absolute;
-    top: 10px;
-    width: 100%;
-    text-align: center;
-    font-size: 28px;
-    font-weight: bold;
-    color: #fff;
-    text-shadow: 2px 2px 4px #000;
-    z-index: 999;
-  }
-  #quizModal {
-    display: none;
-    position: absolute;
-    top: 20%;
-    left: 25%;
-    width: 50%;
-    background: white;
-    padding: 20px;
-    box-shadow: 0 0 10px black;
-    z-index: 1000;
-    border-radius: 10px;
-  }
+    body { margin: 0; font-family: sans-serif; }
+    #title {
+      position: absolute;
+      top: 10px;
+      width: 100%;
+      text-align: center;
+      font-size: 28px;
+      font-weight: bold;
+      color: #fff;
+      text-shadow: 2px 2px 4px #000;
+      z-index: 999;
+    }
+    #quizModal {
+      display: none;
+      position: absolute;
+      top: 20%;
+      left: 25%;
+      width: 50%;
+      background: white;
+      padding: 20px;
+      box-shadow: 0 0 10px black;
+      z-index: 1000;
+      border-radius: 10px;
+    }
+    #startBtn {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      padding: 20px 40px;
+      font-size: 18px;
+      font-weight: bold;
+      background: #228B22;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      z-index: 1001;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    }
 
-  #startBtn {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    padding: 18px 36px;
-    font-size: 20px;
-    font-weight: bold;
-    background-color: #28a745;
-    color: white;
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
-    z-index: 1001;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    transition: all 0.3s ease;
-  }
-
-  #startBtn:hover {
-    background-color: #218838;
-    transform: translate(-50%, -50%) scale(1.05);
-  }
-</style>
-
+    #startBtn:hover {
+      background: #1e7c1e;
+    }
+  </style>
 </head>
 <body>
 
-  <!-- Judul -->
   <div id="title">🌍 Virtual Zoo World Tour</div>
 
-  <!-- Tombol Mulai (agar audio nature bisa diputar) -->
   <button id="startBtn">Mulai Tur</button>
 
-  <!-- Kuis -->
   <div id="quizModal">
     <h3>Kuis Interaktif</h3>
     <p>Hewan apa yang berasal dari benua Afrika?</p>
@@ -72,53 +65,42 @@
     <button onclick="alert('Coba lagi')">Penguin</button>
   </div>
 
-  <!-- Scene A-Frame -->
-  <a-scene background="color: #87CEEB">
+  <a-scene id="scene" background="color: #87CEEB">
     <a-assets>
-      <!-- Models -->
       <a-asset-item id="lionModel" src="assets/models/lion.glb"></a-asset-item>
       <a-asset-item id="elephantModel" src="assets/models/elephant.glb"></a-asset-item>
       <a-asset-item id="tigerModel" src="assets/models/tiger.glb"></a-asset-item>
       <a-asset-item id="kangarooModel" src="assets/models/kangaroo.glb"></a-asset-item>
       <a-asset-item id="penguinModel" src="assets/models/penguin.glb"></a-asset-item>
 
-      <!-- Suara Hewan -->
       <audio id="lionSound" src="assets/sounds/lion.mp3"></audio>
       <audio id="elephantSound" src="assets/sounds/elephant.mp3"></audio>
       <audio id="tigerSound" src="assets/sounds/tiger.mp3"></audio>
       <audio id="kangarooSound" src="assets/sounds/kangaroo.mp3"></audio>
       <audio id="penguinSound" src="assets/sounds/penguin.mp3"></audio>
 
-      <!-- Narasi -->
       <audio id="lionNarration" src="assets/narration/lion.mp3"></audio>
       <audio id="elephantNarration" src="assets/narration/elephant.mp3"></audio>
       <audio id="tigerNarration" src="assets/narration/tiger.mp3"></audio>
       <audio id="kangarooNarration" src="assets/narration/kangaroo.mp3"></audio>
       <audio id="penguinNarration" src="assets/narration/penguin.mp3"></audio>
 
-      <!-- Suara Lingkungan -->
       <audio id="envSound" src="assets/sounds/nature.mp3"></audio>
     </a-assets>
 
-    <!-- Kamera & Cursor -->
-    <a-entity id="camera" camera wasd-controls look-controls position="0 1.6 5">
+    <a-entity id="camera" camera="fov: 80" wasd-controls look-controls position="0 1.6 5">
       <a-cursor raycaster="objects: .clickable"></a-cursor>
     </a-entity>
 
-    <!-- Pencahayaan -->
     <a-light type="ambient" color="#fff"></a-light>
     <a-light type="directional" position="1 4 -3" intensity="1.2"></a-light>
 
-    <!-- Lantai -->
     <a-plane color="#228B22" rotation="-90 0 0" height="100" width="100"></a-plane>
 
-    <!-- Suara lingkungan (dimainkan lewat JS) -->
     <a-entity id="natureAudio" sound="src: #envSound; loop: true; volume: 1.5"></a-entity>
 
-    <!-- Minimap -->
     <a-image src="assets/images/worldmap.jpg" position="0 3 -4" width="3" height="1.5" opacity="0.7"></a-image>
 
-    <!-- Hewan -->
     <a-entity class="clickable" gltf-model="#lionModel" position="-4 0.2 -3" scale="1 1 1"
       sound="src: #lionSound; on: click"
       event-set__enter="_event: mouseenter; scale: 1.1 1.1 1.1"
@@ -139,20 +121,19 @@
       <a-text value="Harimau (Asia)" position="0 2 0" align="center" color="#222"></a-text>
     </a-entity>
 
-    <a-entity class="clickable" gltf-model="#kangarooModel" position="4 0.2 -3" scale="0.9 0.9 0.9"
+    <a-entity class="clickable" gltf-model="#kangarooModel" position="3.5 0.2 -2.5" scale="1 1 1"
       sound="src: #kangarooSound; on: click"
       onclick="playNarration('kangarooNarration')">
       <a-text value="Kanguru (Australia)" position="0 2 0" align="center" color="#222"></a-text>
     </a-entity>
 
-    <a-entity class="clickable" gltf-model="#penguinModel" position="6 0.2 -3" scale="0.9 0.9 0.9"
+    <a-entity class="clickable" gltf-model="#penguinModel" position="5 0.2 -2.5" scale="1 1 1"
       sound="src: #penguinSound; on: click"
       onclick="playNarration('penguinNarration')">
       <a-text value="Penguin (Kutub)" position="0 2 0" align="center" color="#222"></a-text>
     </a-entity>
   </a-scene>
 
-  <!-- Script untuk narasi & tombol mulai -->
   <script>
     let animalsSeen = new Set();
 
@@ -170,12 +151,22 @@
     }
 
     document.getElementById('startBtn').addEventListener('click', function () {
-      // Putar suara nature lewat A-Frame <a-sound>
       document.querySelector('#natureAudio').components.sound.playSound();
-
-      // Sembunyikan tombol
       this.style.display = 'none';
     });
+
+    // Zoom dengan scroll mouse
+    const camera = document.querySelector('[camera]');
+    let fov = 80;
+    window.addEventListener('wheel', function (e) {
+      if (e.deltaY < 0 && fov > 30) {
+        fov -= 5;
+      } else if (e.deltaY > 0 && fov < 100) {
+        fov += 5;
+      }
+      camera.setAttribute('camera', 'fov', fov);
+    });
   </script>
+
 </body>
 </html>
